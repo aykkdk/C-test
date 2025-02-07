@@ -12,12 +12,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
+    - name: 检出代码
+      uses: actions/checkout@v4
+      with:
+        submodules: true  # 确保检出所有代码
+
+    - name: 列出目录内容
+      run: ls -la
+
+    - name: 生成 configure（如果不存在）
+      run: |
+        if [ ! -f configure ]; then
+          echo "生成 configure 文件"
+          ./autogen.sh || autoreconf -i
+        fi
+
+    - name: 赋予 configure 可执行权限
+      run: chmod +x configure
+
+    - name: 运行 configure
+      run: ./configure --prefix=/usr
+
+    - name: 编译
+      run: make -j$(nproc)
+
+    - name: 运行测试
       run: make check
-    - name: make distcheck
+
+    - name: 运行 distcheck
       run: make distcheck
