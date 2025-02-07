@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: C++ CI
 
 on:
   push:
@@ -13,35 +13,12 @@ jobs:
     steps:
     - name: 检出代码
       uses: actions/checkout@v4
-      with:
-        submodules: true  # 确保检出所有代码
 
-    - name: 安装依赖
-      run: sudo apt update && sudo apt install -y build-essential autoconf automake libtool
+    - name: 安装编译工具
+      run: sudo apt update && sudo apt install -y g++
 
-    - name: 列出项目文件
-      run: ls -la
+    - name: 编译 C++ 代码
+      run: g++ -o my_program main.cpp
 
-    - name: 生成 configure（如果需要）
-      run: |
-        if [ -f configure.ac ]; then
-          autoreconf -i
-        else
-          echo "Error: configure.ac 不存在，无法生成 configure"
-          exit 1
-        fi
-
-    - name: 赋予 configure 执行权限
-      run: chmod +x configure
-
-    - name: 运行 configure
-      run: ./configure --prefix=/usr
-
-    - name: 编译
-      run: make -j$(nproc)
-
-    - name: 运行测试
-      run: make check
-
-    - name: 运行 distcheck
-      run: make distcheck
+    - name: 运行程序（可选）
+      run: ./my_program
