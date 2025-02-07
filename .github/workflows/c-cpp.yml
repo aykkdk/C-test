@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -17,17 +16,22 @@ jobs:
       with:
         submodules: true  # 确保检出所有代码
 
-    - name: 列出目录内容
+    - name: 安装依赖
+      run: sudo apt update && sudo apt install -y build-essential autoconf automake libtool
+
+    - name: 列出项目文件
       run: ls -la
 
-    - name: 生成 configure（如果不存在）
+    - name: 生成 configure（如果需要）
       run: |
-        if [ ! -f configure ]; then
-          echo "生成 configure 文件"
-          ./autogen.sh || autoreconf -i
+        if [ -f configure.ac ]; then
+          autoreconf -i
+        else
+          echo "Error: configure.ac 不存在，无法生成 configure"
+          exit 1
         fi
 
-    - name: 赋予 configure 可执行权限
+    - name: 赋予 configure 执行权限
       run: chmod +x configure
 
     - name: 运行 configure
